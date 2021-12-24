@@ -9,10 +9,11 @@ add_subdirectory(external/glm)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glad)
 add_subdirectory(external/spdlog)
+add_subdirectory(external/imgui)
 
 set(SOURCES
   src/main.cpp
 )
 
 add_executable(playground ${SOURCES})
-target_link_libraries(playground glm glfw glad spdlog)
+target_link_libraries(playground glm glfw glad spdlog imgui)

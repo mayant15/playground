@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
@@ -22,6 +26,8 @@ void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, in
 
 int main(void)
 {
+    const char *glsl_version = "#version 460";
+
     // Initialize
     if (glfwInit() == GLFW_FALSE)
     {
@@ -42,6 +48,7 @@ int main(void)
     }
     glfwSetKeyCallback(window, glfw_key_callback);
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
     // Initialize glad
     int version = gladLoadGL(glfwGetProcAddress);
@@ -53,6 +60,24 @@ int main(void)
 
     pg::log::info("Successfully initialized OpenGL context");
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+    // Load Fonts
+    io.Fonts->AddFontDefault();
+
+    bool show_demo_window = true;
+    bool show_another_window = false;
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
@@ -61,13 +86,31 @@ int main(void)
     // Main loop
     while (!glfwWindowShouldClose(window))
     {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+
+        // Prepare the UI for render
+        ImGui::NewFrame();
+
+        if (show_demo_window)
+        {
+            ImGui::ShowDemoWindow(&show_demo_window);
+        }
+
+        ImGui::Render();
+
         glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     // Shutdown
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     glfwDestroyWindow(window);
     glfwTerminate();
 
