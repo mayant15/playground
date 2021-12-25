@@ -13,7 +13,10 @@ add_subdirectory(external/imgui)
 
 set(SOURCES
   src/main.cpp
+  src/Window.cpp
+  src/utility/ui.cpp
 )
 
 add_executable(playground ${SOURCES})
-target_link_libraries(playground glm glfw glad spdlog imgui)
+target_include_directories(playground PUBLIC src)
+target_link_libraries(playground PUBLIC glm glfw glad spdlog imgui)
