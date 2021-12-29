@@ -14,6 +14,7 @@ add_subdirectory(external/imgui)
 set(SOURCES
   src/main.cpp
   src/Window.cpp
+  src/Shader.cpp
   src/utility/ui.cpp
 )
 
