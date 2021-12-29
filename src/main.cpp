@@ -78,11 +78,15 @@ int main(void)
     ImVec4 clear_color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 1.0f);
     ImVec4 fill_color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 1.0f / 255.0f, 1.0f);
 
+    bool wireframe = false;
+
     // Main loop
     while (!window.should_close())
     {
         pg::ui::new_frame();
         pg::ui::demo_window(show_demo_window);
+
+        ImGui::Checkbox("Wireframe", &wireframe);
 
         ImGui::Text("Clear color");
         ImGui::ColorEdit3("ClearColor##1", (float *)&clear_color, 0);
@@ -100,9 +104,16 @@ int main(void)
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        if (wireframe)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+
         program.set_vec3f("fill_color", {XYZ(fill_color)});
 
         glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         pg::ui::render();
 
