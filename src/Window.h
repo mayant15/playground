@@ -33,11 +33,6 @@ namespace pg
         friend void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int modifiers)
         {
             const auto *w = static_cast<Window *>(glfwGetWindowUserPointer(window));
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-            {
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-            }
-
             for (const auto &callback : w->_key_press_callbacks)
             {
                 std::invoke(callback, key);

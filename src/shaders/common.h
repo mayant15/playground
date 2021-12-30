@@ -2,7 +2,7 @@
 
 #include <ShaderProgramImpl.h>
 
-#define PG_DEFINE_UNIFORMS(PARAMS) void set_uniforms(PARAMS) const
+#define PG_DEFINE_UNIFORMS(...) void set_uniforms(__VA_ARGS__) const
 
 #define PG_DEFINE_VERTEX_SHADER(FILE)                    \
     pg::ShaderConfig vertex_shader_config{};             \

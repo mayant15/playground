@@ -13,6 +13,7 @@ namespace pg
         void use() const;
         void reload();
         void set_vec3f(const std::string &name, const glm::vec3 &vec) const;
+        void set_mat4f(const std::string &name, const glm::mat4 &mat) const;
         void set_color(const std::string &name, const Color &color) const;
 
     private:

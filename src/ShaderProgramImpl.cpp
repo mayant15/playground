@@ -1,6 +1,7 @@
 #include "ShaderProgramImpl.h"
 #include "utility/logger.h"
 #include "utility/pgmath.h"
+#include <glm/gtc/type_ptr.hpp>
 
 namespace pg
 {
@@ -60,5 +61,11 @@ namespace pg
     {
         const int loc = glGetUniformLocation(_id, name.c_str());
         glUniform4f(loc, XYZW(color));
+    }
+
+    void ShaderProgramImpl::set_mat4f(const std::string &name, const glm::mat4 &mat) const
+    {
+        const int loc = glGetUniformLocation(_id, name.c_str());
+        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(mat));
     }
 } // namespace pg

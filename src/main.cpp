@@ -8,9 +8,14 @@
 
 #include "shaders/SolidShader.h"
 
+#include "geometry/Rectangle.h"
+#include "geometry/Cube.h"
+
 #include "utility/logger.h"
 #include "utility/ui.h"
 #include "utility/pgmath.h"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 int main(void)
 {
@@ -35,6 +40,7 @@ int main(void)
 
     // v-sync
     glfwSwapInterval(1);
+    glEnable(GL_DEPTH_TEST);
 
     pg::log::info("Successfully initialized OpenGL context");
 
@@ -42,24 +48,8 @@ int main(void)
 
     bool show_demo_window = true;
 
-    // vertices and indices
-    std::vector<pg::vertex_t> vertices = {
-        0.5f, 0.5f, 0.0f,   // top right
-        0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f   // top left
-    };
-    std::vector<pg::index_t> indices = {
-        // note that we start from 0!
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
-    };
-
-    pg::VertexArrayInfo vertex_info{};
-    vertex_info
-        .add_vertex_array(vertices)
-        .add_indices_array(indices)
-        .layout_vertices(pg::VERTEX_POSITION_LAYOUT_INDEX);
+    // auto vertex_info = pg::create_rectangle_vertex_info();
+    auto vertex_info = pg::create_cube_vertex_info();
 
     pg::shaders::SolidShader solid_shader{};
 
@@ -92,7 +82,7 @@ int main(void)
 
         glClearColor(XYZW(user_config.clear_color));
 
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         if (user_config.wireframe)
         {
@@ -100,8 +90,37 @@ int main(void)
         }
 
         solid_shader.use();
+
         const pg::Color fill_color{XYZW(user_config.fill_color)};
-        solid_shader.set_uniforms(fill_color);
+
+        glm::mat4 model(1.0);
+        model = glm::translate(
+            model,
+            glm::vec3{
+                user_config.object_pos[0],
+                user_config.object_pos[1],
+                user_config.object_pos[2],
+            });
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+
+        glm::mat4 view = glm::lookAt(
+            glm::vec3{
+                user_config.camera_pos[0],
+                user_config.camera_pos[1],
+                user_config.camera_pos[2]},
+            glm::vec3{
+                user_config.look_at[0],
+                user_config.look_at[1],
+                user_config.look_at[2]},
+            glm::vec3{0.0, 1.0, 0.0});
+
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), width / (float)height, 0.1f, 100.0f);
+
+        solid_shader.set_uniforms(
+            fill_color,
+            model,
+            view,
+            projection);
 
         vertex_info.render();
 

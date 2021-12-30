@@ -45,6 +45,10 @@ namespace pg::ui
         {
             ImGui::Begin("User Config Controls", &show);
 
+            ImGui::Separator();
+            ImGui::Text("Render Settings");
+            ImGui::Separator();
+
             ImGui::Checkbox("Wireframe", &config.wireframe);
 
             ImGui::Text("Clear color");
@@ -52,6 +56,19 @@ namespace pg::ui
 
             ImGui::Text("Fill color");
             ImGui::ColorEdit3("FillColor##1", (float *)&config.fill_color, 0);
+
+            ImGui::Separator();
+            ImGui::Text("Camera Settings");
+            ImGui::Separator();
+
+            ImGui::DragFloat3("Position##Camera", config.camera_pos);
+            ImGui::DragFloat3("Look At", config.look_at);
+
+            ImGui::Separator();
+            ImGui::Text("Object Settings");
+            ImGui::Separator();
+
+            ImGui::DragFloat3("Position##Object", config.object_pos);
 
             ImGui::End();
         }
