@@ -4,23 +4,29 @@
 
 namespace pg
 {
-    ShaderProgramImpl::ShaderProgramImpl(const Shader &vertex, const Shader &fragment)
+    void link(SRef<Shader> vertex, SRef<Shader> fragment, unsigned int id)
     {
-        _id = glCreateProgram();
-        vertex.attach_to_program(_id);
-        fragment.attach_to_program(_id);
+        vertex->attach_to_program(id);
+        fragment->attach_to_program(id);
 
-        glLinkProgram(_id);
+        glLinkProgram(id);
 
         // Report errors
         int success;
         char log[512];
-        glGetProgramiv(_id, GL_LINK_STATUS, &success);
+        glGetProgramiv(id, GL_LINK_STATUS, &success);
         if (!success)
         {
-            glGetProgramInfoLog(_id, 512, nullptr, log);
-            pg::log::error("[Shader({})]: Program linking failed for shaders\n{}\n{}", vertex, fragment);
+            glGetProgramInfoLog(id, 512, nullptr, log);
+            pg::log::error("[Shader({})]: Program linking failed for shaders\n{}\n{}", *vertex, *fragment);
         }
+    }
+
+    ShaderProgramImpl::ShaderProgramImpl(SRef<Shader> vertex, SRef<Shader> fragment)
+        : _vertex(vertex), _fragment(fragment)
+    {
+        _id = glCreateProgram();
+        link(_vertex, _fragment, _id);
     }
 
     ShaderProgramImpl::~ShaderProgramImpl()
@@ -31,6 +37,17 @@ namespace pg
     void ShaderProgramImpl::use() const
     {
         glUseProgram(_id);
+    }
+
+    void ShaderProgramImpl::reload()
+    {
+        _vertex->detach_from_program(_id);
+        _vertex->reload();
+
+        _fragment->detach_from_program(_id);
+        _fragment->reload();
+
+        link(_vertex, _fragment, _id);
     }
 
     void ShaderProgramImpl::set_vec3f(const std::string &name, const glm::vec3 &vec) const

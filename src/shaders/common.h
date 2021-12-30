@@ -8,34 +8,34 @@
     pg::ShaderConfig vertex_shader_config{};             \
     vertex_shader_config.filename = FILE;                \
     vertex_shader_config.type = pg::EShaderType::VERTEX; \
-    pg::Shader vertex_shader{vertex_shader_config};
+    pg::SRef<pg::Shader> vertex_shader = std::make_shared<pg::Shader>(vertex_shader_config);
 
 #define PG_DEFINE_FRAGMENT_SHADER(FILE)                      \
     pg::ShaderConfig fragment_shader_config{};               \
     fragment_shader_config.filename = FILE;                  \
     fragment_shader_config.type = pg::EShaderType::FRAGMENT; \
-    pg::Shader fragment_shader{fragment_shader_config};
+    pg::SRef<pg::Shader> fragment_shader = std::make_shared<pg::Shader>(fragment_shader_config);
 
-#define PG_DEFINE_SHADER(NAME, VERTEX, FRAGMENT, UNIFORM_FUNCTION)             \
-    class NAME                                                                 \
-    {                                                                          \
-    public:                                                                    \
-        NAME()                                                                 \
-        {                                                                      \
-            VERTEX                                                             \
-            FRAGMENT                                                           \
-            _impl = new pg::ShaderProgramImpl{vertex_shader, fragment_shader}; \
-        }                                                                      \
-        ~NAME()                                                                \
-        {                                                                      \
-            delete _impl;                                                      \
-        }                                                                      \
-        UNIFORM_FUNCTION                                                       \
-        void use() const                                                       \
-        {                                                                      \
-            _impl->use();                                                      \
-        }                                                                      \
-                                                                               \
-    private:                                                                   \
-        const pg::ShaderProgramImpl *_impl = nullptr;                          \
+#define PG_DEFINE_SHADER(NAME, VERTEX, FRAGMENT, UNIFORM_FUNCTION)                           \
+    class NAME                                                                               \
+    {                                                                                        \
+    public:                                                                                  \
+        NAME()                                                                               \
+        {                                                                                    \
+            VERTEX                                                                           \
+            FRAGMENT                                                                         \
+            _impl = std::make_unique<pg::ShaderProgramImpl>(vertex_shader, fragment_shader); \
+        }                                                                                    \
+        UNIFORM_FUNCTION                                                                     \
+        void use() const                                                                     \
+        {                                                                                    \
+            _impl->use();                                                                    \
+        }                                                                                    \
+        void reload()                                                                        \
+        {                                                                                    \
+            _impl->reload();                                                                 \
+        }                                                                                    \
+                                                                                             \
+    private:                                                                                 \
+        pg::URef<pg::ShaderProgramImpl> _impl;                                               \
     };

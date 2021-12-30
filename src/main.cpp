@@ -63,6 +63,15 @@ int main(void)
 
     pg::shaders::SolidShader solid_shader{};
 
+    const auto reload_shaders_callback = [&solid_shader](int key)
+    {
+        if (key == GLFW_KEY_R)
+        {
+            solid_shader.reload();
+        }
+    };
+    window.add_key_press_callback(reload_shaders_callback);
+
     pg::ui::UserConfig user_config{};
 
     bool show_user_config_controls = true;

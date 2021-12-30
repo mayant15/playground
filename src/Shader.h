@@ -40,6 +40,7 @@ namespace pg
         void reload();
 
         void attach_to_program(unsigned int program_id) const;
+        void detach_from_program(unsigned int program_id) const;
 
         template <typename OStream>
         friend inline OStream &operator<<(OStream &os, const Shader &shader)
@@ -50,7 +51,5 @@ namespace pg
     private:
         unsigned int _id;
         ShaderConfig _conf;
-
-        void compile() const;
     };
 } // namespace pg

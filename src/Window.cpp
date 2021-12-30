@@ -8,14 +8,6 @@ namespace pg
         pg::log::error("[GLFW{}]: {}", error, description);
     }
 
-    void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int modifiers)
-    {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        {
-            glfwSetWindowShouldClose(window, GLFW_TRUE);
-        }
-    }
-
     int Window::init(const WindowOp &op)
     {
         const char *glsl_version = "#version 460";
@@ -38,7 +30,10 @@ namespace pg
             pg::log::error("Failed to create GLFW window");
             return EXIT_FAILURE;
         }
-        glfwSetKeyCallback(_p_window, glfw_key_callback);
+
+        glfwSetWindowUserPointer(_p_window, this);
+
+        glfwSetKeyCallback(_p_window, pg::glfw_key_callback);
 
         return EXIT_SUCCESS;
     }
@@ -70,6 +65,11 @@ namespace pg
     void Window::swap_buffers() const
     {
         glfwSwapBuffers(_p_window);
+    }
+
+    void Window::add_key_press_callback(const std::function<void(int)> &callback)
+    {
+        _key_press_callbacks.push_back(callback);
     }
 
     GLFWwindow *Window::get_raw_pointer() const

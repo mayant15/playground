@@ -24,8 +24,25 @@ namespace pg
         void swap_buffers() const;
         GLFWwindow *get_raw_pointer() const;
 
+        void add_key_press_callback(const std::function<void(int)> &callback);
+
     private:
         GLFWwindow *_p_window = nullptr;
+        std::vector<std::function<void(int)>> _key_press_callbacks = {};
+
+        friend void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int modifiers)
+        {
+            const auto *w = static_cast<Window *>(glfwGetWindowUserPointer(window));
+            if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+            {
+                glfwSetWindowShouldClose(window, GLFW_TRUE);
+            }
+
+            for (const auto &callback : w->_key_press_callbacks)
+            {
+                std::invoke(callback, key);
+            }
+        }
     };
 
     void poll_window_events();
