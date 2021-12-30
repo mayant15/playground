@@ -38,11 +38,18 @@ int main(void)
 
     bool show_demo_window = true;
 
-    // vertices
+    // vertices and indices
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f};
+        0.5f, 0.5f, 0.0f,   // top right
+        0.5f, -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f, // bottom left
+        -0.5f, 0.5f, 0.0f   // top left
+    };
+    unsigned int indices[] = {
+        // note that we start from 0!
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
 
     // Setup VAO to store vertex data configuration
     unsigned int vao;
@@ -53,9 +60,15 @@ int main(void)
     unsigned int vbo;
     glGenBuffers(1, &vbo);
 
+    unsigned int ebo;
+    glGenBuffers(1, &ebo);
+
     // Bind and configure this as an array buffer
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Setup vertex shader input layout
     glVertexAttribPointer(pg::VERTEX_POSITION_LAYOUT_INDEX, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
@@ -111,7 +124,11 @@ int main(void)
 
         program.set_vec3f("fill_color", {XYZ(fill_color)});
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glBindVertexArray(vao);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(0);
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
