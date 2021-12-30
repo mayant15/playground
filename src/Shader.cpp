@@ -1,6 +1,8 @@
 #include <glad/gl.h>
 #include "Shader.h"
+
 #include "utility/logger.h"
+#include "utility/pgmath.h"
 
 #include <fstream>
 
@@ -64,46 +66,4 @@ namespace pg
     {
         glAttachShader(program_id, _id);
     }
-
-    ShaderProgram::ShaderProgram(const std::vector<Shader *> &shaders)
-    {
-        _id = glCreateProgram();
-        for (const auto *shader : shaders)
-        {
-            shader->attach_to_program(_id);
-        }
-
-        glLinkProgram(_id);
-
-        // Report errors
-        int success;
-        char log[512];
-        glGetProgramiv(_id, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(_id, 512, nullptr, log);
-            pg::log::error("[Shader({})]: Program linking failed for shaders");
-            for (const auto *shader : shaders)
-            {
-                pg::log::error("\t{}", *shader);
-            }
-        }
-    }
-
-    ShaderProgram::~ShaderProgram()
-    {
-        glDeleteProgram(_id);
-    }
-
-    void ShaderProgram::use() const
-    {
-        glUseProgram(_id);
-    }
-
-    void ShaderProgram::set_vec3f(const std::string &name, const glm::vec3 &vec) const
-    {
-        const int loc = glGetUniformLocation(_id, name.c_str());
-        glUniform3f(loc, vec.x, vec.y, vec.z);
-    }
-
 } // namespace pg

@@ -1,9 +1,12 @@
 #include <iostream>
 
 #include "base.h"
+#include "constants.h"
 #include "Window.h"
 #include "Shader.h"
 #include "VertexArrayInfo.h"
+
+#include "shaders/SolidShader.h"
 
 #include "utility/logger.h"
 #include "utility/ui.h"
@@ -58,17 +61,7 @@ int main(void)
         .add_indices_array(indices)
         .layout_vertices(pg::VERTEX_POSITION_LAYOUT_INDEX);
 
-    pg::ShaderConfig vertex_shader_config{};
-    vertex_shader_config.filename = "D:\\code\\graphics\\playground\\src\\shaders\\identity.vert";
-    vertex_shader_config.type = pg::EShaderType::VERTEX;
-    pg::Shader vertex_shader{vertex_shader_config};
-
-    pg::ShaderConfig fragment_shader_config{};
-    fragment_shader_config.filename = "D:\\code\\graphics\\playground\\src\\shaders\\solid_color.frag";
-    fragment_shader_config.type = pg::EShaderType::FRAGMENT;
-    pg::Shader fragment_shader{fragment_shader_config};
-
-    pg::ShaderProgram program{std::vector{&vertex_shader, &fragment_shader}};
+    pg::shaders::SolidShader solid_shader{};
 
     pg::ui::UserConfig user_config{};
 
@@ -97,8 +90,9 @@ int main(void)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
-        program.use();
-        program.set_vec3f("fill_color", {XYZ(user_config.fill_color)});
+        solid_shader.use();
+        const pg::Color fill_color{XYZW(user_config.fill_color)};
+        solid_shader.set_uniforms(fill_color);
 
         vertex_info.render();
 

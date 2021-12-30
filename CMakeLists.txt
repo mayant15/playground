@@ -15,6 +15,7 @@ set(SOURCES
   src/main.cpp
   src/Window.cpp
   src/Shader.cpp
+  src/ShaderProgramImpl.cpp
   src/VertexArrayInfo.cpp
   src/utility/ui.cpp
 )

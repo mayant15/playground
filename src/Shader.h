@@ -1,12 +1,9 @@
 #pragma once
 
 #include "base.h"
-#include "utility/logger.h"
 
 namespace pg
 {
-    constexpr vertex_layout_index_t VERTEX_POSITION_LAYOUT_INDEX = 0;
-
     enum class EShaderType
     {
         VERTEX,
@@ -47,7 +44,7 @@ namespace pg
         template <typename OStream>
         friend inline OStream &operator<<(OStream &os, const Shader &shader)
         {
-            return os << shader._conf.filename;
+            return os << "(" << shader._conf.type << ") " << shader._conf.filename;
         }
 
     private:
@@ -55,18 +52,5 @@ namespace pg
         ShaderConfig _conf;
 
         void compile() const;
-    };
-
-    class ShaderProgram
-    {
-    public:
-        ShaderProgram(const std::vector<Shader *> &shaders);
-        ~ShaderProgram();
-
-        void use() const;
-        void set_vec3f(const std::string &name, const glm::vec3 &vec) const;
-
-    private:
-        unsigned int _id;
     };
 } // namespace pg
