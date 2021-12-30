@@ -3,11 +3,11 @@
 #include "base.h"
 #include "Window.h"
 #include "Shader.h"
+#include "VertexArrayInfo.h"
 
 #include "utility/logger.h"
 #include "utility/ui.h"
-
-#define XYZ(VEC) VEC.x, VEC.y, VEC.z
+#include "utility/pgmath.h"
 
 int main(void)
 {
@@ -30,6 +30,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
+    // v-sync
     glfwSwapInterval(1);
 
     pg::log::info("Successfully initialized OpenGL context");
@@ -39,40 +40,23 @@ int main(void)
     bool show_demo_window = true;
 
     // vertices and indices
-    float vertices[] = {
+    std::vector<pg::vertex_t> vertices = {
         0.5f, 0.5f, 0.0f,   // top right
         0.5f, -0.5f, 0.0f,  // bottom right
         -0.5f, -0.5f, 0.0f, // bottom left
         -0.5f, 0.5f, 0.0f   // top left
     };
-    unsigned int indices[] = {
+    std::vector<pg::index_t> indices = {
         // note that we start from 0!
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
 
-    // Setup VAO to store vertex data configuration
-    unsigned int vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    // Setup buffers
-    unsigned int vbo;
-    glGenBuffers(1, &vbo);
-
-    unsigned int ebo;
-    glGenBuffers(1, &ebo);
-
-    // Bind and configure this as an array buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // Setup vertex shader input layout
-    glVertexAttribPointer(pg::VERTEX_POSITION_LAYOUT_INDEX, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void *)0);
-    glEnableVertexAttribArray(pg::VERTEX_POSITION_LAYOUT_INDEX);
+    pg::VertexArrayInfo vertex_info{};
+    vertex_info
+        .add_vertex_array(vertices)
+        .add_indices_array(indices)
+        .layout_vertices(pg::VERTEX_POSITION_LAYOUT_INDEX);
 
     pg::ShaderConfig vertex_shader_config{};
     vertex_shader_config.filename = "D:\\code\\graphics\\playground\\src\\shaders\\identity.vert";
@@ -86,12 +70,9 @@ int main(void)
 
     pg::ShaderProgram program{std::vector{&vertex_shader, &fragment_shader}};
 
-    program.use();
+    pg::ui::UserConfig user_config{};
 
-    ImVec4 clear_color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 154.0f / 255.0f, 1.0f);
-    ImVec4 fill_color = ImVec4(114.0f / 255.0f, 144.0f / 255.0f, 1.0f / 255.0f, 1.0f);
-
-    bool wireframe = false;
+    bool show_user_config_controls = true;
 
     // Main loop
     while (!window.should_close())
@@ -99,13 +80,7 @@ int main(void)
         pg::ui::new_frame();
         pg::ui::demo_window(show_demo_window);
 
-        ImGui::Checkbox("Wireframe", &wireframe);
-
-        ImGui::Text("Clear color");
-        ImGui::ColorEdit3("ClearColor##1", (float *)&clear_color, 0);
-
-        ImGui::Text("Fill color");
-        ImGui::ColorEdit3("FillColor##1", (float *)&fill_color, 0);
+        pg::ui::user_config(user_config, show_user_config_controls);
 
         pg::ui::finalize_frame();
 
@@ -113,25 +88,23 @@ int main(void)
         const auto &[width, height] = window.get_dims();
         glViewport(0, 0, width, height);
 
-        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClearColor(XYZW(user_config.clear_color));
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        if (wireframe)
+        if (user_config.wireframe)
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
-        program.set_vec3f("fill_color", {XYZ(fill_color)});
+        program.use();
+        program.set_vec3f("fill_color", {XYZ(user_config.fill_color)});
 
-        glBindVertexArray(vao);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(0);
+        vertex_info.render();
 
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        // Render the UI on top
         pg::ui::render();
 
         window.swap_buffers();

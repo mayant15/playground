@@ -1,15 +1,11 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
+#include "base.h"
 #include "utility/logger.h"
-#include <glm/glm.hpp>
 
 namespace pg
 {
-
-    constexpr unsigned int VERTEX_POSITION_LAYOUT_INDEX = 0;
+    constexpr vertex_layout_index_t VERTEX_POSITION_LAYOUT_INDEX = 0;
 
     enum class EShaderType
     {
