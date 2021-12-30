@@ -19,7 +19,7 @@ namespace pg
         if (!success)
         {
             glGetProgramInfoLog(id, 512, nullptr, log);
-            pg::log::error("[Shader({})]: Program linking failed for shaders\n{}\n{}", *vertex, *fragment);
+            pg::log::error("[Shader]: Program linking failed for shaders\n{}\n{}\n{}", *vertex, *fragment, log);
         }
     }
 

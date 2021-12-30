@@ -1,5 +1,9 @@
 #include "ui.h"
 
+#include <array>
+#include <shaders/PhongShader.h>
+#include <shaders/SolidShader.h>
+
 namespace pg::ui
 {
 
@@ -49,6 +53,26 @@ namespace pg::ui
             ImGui::Text("Render Settings");
             ImGui::Separator();
 
+            static std::array<std::string, 2> items = {
+                pg::shaders::SolidShader::name,
+                pg::shaders::PhongShader::name,
+            };
+
+            std::string combo_preview_value = config.shader_type;
+            if (ImGui::BeginCombo("Shader", combo_preview_value.c_str(), 0))
+            {
+                for (int n = 0; n < items.size(); n++)
+                {
+                    const bool is_selected = (items[n] == config.shader_type);
+                    if (ImGui::Selectable(items[n].c_str(), is_selected))
+                        config.shader_type = items[n];
+
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndCombo();
+            }
+
             ImGui::Checkbox("Wireframe", &config.wireframe);
 
             ImGui::Text("Clear color");
@@ -56,6 +80,13 @@ namespace pg::ui
 
             ImGui::Text("Fill color");
             ImGui::ColorEdit3("FillColor##1", (float *)&config.fill_color, 0);
+
+            ImGui::Separator();
+            ImGui::Text("Light Settings");
+            ImGui::Separator();
+
+            ImGui::DragFloat3("Position##Light", config.light_pos);
+            ImGui::ColorEdit3("Ambient", (float *)&config.ambient);
 
             ImGui::Separator();
             ImGui::Text("Camera Settings");
@@ -69,6 +100,7 @@ namespace pg::ui
             ImGui::Separator();
 
             ImGui::DragFloat3("Position##Object", config.object_pos);
+            ImGui::ColorEdit3("Albedo", (float *)&config.albedo);
 
             ImGui::End();
         }

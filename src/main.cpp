@@ -7,6 +7,7 @@
 #include "VertexArrayInfo.h"
 
 #include "shaders/SolidShader.h"
+#include "shaders/PhongShader.h"
 
 #include "geometry/Rectangle.h"
 #include "geometry/Cube.h"
@@ -51,18 +52,23 @@ int main(void)
     // auto vertex_info = pg::create_rectangle_vertex_info();
     auto vertex_info = pg::create_cube_vertex_info();
 
-    pg::shaders::SolidShader solid_shader{};
+    pg::ui::UserConfig user_config{};
+    user_config.shader_type = pg::shaders::PhongShader::name;
 
-    const auto reload_shaders_callback = [&solid_shader](int key)
+    pg::shaders::SolidShader solid_shader{};
+    pg::shaders::PhongShader phong_shader{};
+
+    const auto reload_shaders_callback = [&solid_shader, &phong_shader, &user_config](int key)
     {
         if (key == GLFW_KEY_R)
         {
-            solid_shader.reload();
+            if (user_config.shader_type == pg::shaders::SolidShader::name)
+                solid_shader.reload();
+            else if (user_config.shader_type == pg::shaders::PhongShader::name)
+                phong_shader.reload();
         }
     };
     window.add_key_press_callback(reload_shaders_callback);
-
-    pg::ui::UserConfig user_config{};
 
     bool show_user_config_controls = true;
 
@@ -89,38 +95,41 @@ int main(void)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
-        solid_shader.use();
-
         const pg::Color fill_color{XYZW(user_config.fill_color)};
 
         glm::mat4 model(1.0);
         model = glm::translate(
             model,
-            glm::vec3{
-                user_config.object_pos[0],
-                user_config.object_pos[1],
-                user_config.object_pos[2],
-            });
+            to_vec3_from_array(user_config.object_pos));
         model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
 
         glm::mat4 view = glm::lookAt(
-            glm::vec3{
-                user_config.camera_pos[0],
-                user_config.camera_pos[1],
-                user_config.camera_pos[2]},
-            glm::vec3{
-                user_config.look_at[0],
-                user_config.look_at[1],
-                user_config.look_at[2]},
+            to_vec3_from_array(user_config.camera_pos),
+            to_vec3_from_array(user_config.look_at),
             glm::vec3{0.0, 1.0, 0.0});
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), width / (float)height, 0.1f, 100.0f);
 
-        solid_shader.set_uniforms(
-            fill_color,
-            model,
-            view,
-            projection);
+        if (user_config.shader_type == pg::shaders::SolidShader::name)
+        {
+            solid_shader.use();
+            solid_shader.set_uniforms(
+                fill_color,
+                model,
+                view,
+                projection);
+        }
+        else if (user_config.shader_type == pg::shaders::PhongShader::name)
+        {
+            phong_shader.use();
+            phong_shader.set_uniforms(
+                pg::Color{XYZW(user_config.ambient)},
+                pg::Color{XYZW(user_config.albedo)},
+                to_vec3_from_array(user_config.light_pos),
+                model,
+                view,
+                projection);
+        }
 
         vertex_info.render();
 

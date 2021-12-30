@@ -2,6 +2,9 @@
 
 #include <ShaderProgramImpl.h>
 
+#define PG_QUOTE_IMPL(X) #X
+#define PG_QUOTE(X) PG_QUOTE_IMPL(X)
+
 #define PG_DEFINE_UNIFORMS(...) void set_uniforms(__VA_ARGS__) const
 
 #define PG_DEFINE_VERTEX_SHADER(FILE)                    \
@@ -20,6 +23,7 @@
     class NAME                                                                               \
     {                                                                                        \
     public:                                                                                  \
+        static inline const std::string name = PG_QUOTE(NAME);                               \
         NAME()                                                                               \
         {                                                                                    \
             VERTEX                                                                           \
