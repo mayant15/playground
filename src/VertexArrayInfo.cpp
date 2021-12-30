@@ -50,12 +50,23 @@ namespace pg
         return *this;
     }
 
-    VertexArrayInfo &VertexArrayInfo::layout_vertices(vertex_layout_index_t index)
+    VertexArrayInfo &VertexArrayInfo::layout_vertices(layout_index_t index)
     {
         if (!_is_bound)
             bind();
 
-        glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t) * 3, (void *)0);
+        glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t) * 6, (void *)0);
+        glEnableVertexAttribArray(index);
+
+        return *this;
+    }
+
+    VertexArrayInfo &VertexArrayInfo::layout_normals(layout_index_t index)
+    {
+        if (!_is_bound)
+            bind();
+
+        glVertexAttribPointer(index, 3, GL_FLOAT, GL_FALSE, sizeof(vertex_t) * 6, (void *)(3 * sizeof(vertex_t)));
         glEnableVertexAttribArray(index);
 
         return *this;

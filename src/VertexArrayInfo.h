@@ -14,7 +14,8 @@ namespace pg
 
         VertexArrayInfo &add_vertex_array(const std::vector<vertex_t> &vertices);
         VertexArrayInfo &add_indices_array(const std::vector<index_t> &indices);
-        VertexArrayInfo &layout_vertices(vertex_layout_index_t index);
+        VertexArrayInfo &layout_vertices(layout_index_t index);
+        VertexArrayInfo &layout_normals(layout_index_t index);
         void bind();
         void unbind();
         void render();
