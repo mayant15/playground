@@ -39,6 +39,24 @@ namespace pg::ui
         }
     }
 
+    void user_config(UserConfig &config, bool &show)
+    {
+        if (show)
+        {
+            ImGui::Begin("User Config Controls", &show);
+
+            ImGui::Checkbox("Wireframe", &config.wireframe);
+
+            ImGui::Text("Clear color");
+            ImGui::ColorEdit3("ClearColor##1", (float *)&config.clear_color, 0);
+
+            ImGui::Text("Fill color");
+            ImGui::ColorEdit3("FillColor##1", (float *)&config.fill_color, 0);
+
+            ImGui::End();
+        }
+    }
+
     void finalize_frame()
     {
         ImGui::Render();
