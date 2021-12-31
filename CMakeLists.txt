@@ -4,12 +4,16 @@ set(CMAKE_CXX_STANDARD 17)
 
 include(FetchContent)
 
+# Export a compilation database for YouCompleteMe
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Setup dependencies
 add_subdirectory(external/glm)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glad)
 add_subdirectory(external/spdlog)
 add_subdirectory(external/imgui)
+add_subdirectory(external/assimp)
 
 set(SOURCES
   src/main.cpp
