@@ -30,14 +30,7 @@ namespace pg
         GLFWwindow *_p_window = nullptr;
         std::vector<std::function<void(int)>> _key_press_callbacks = {};
 
-        friend void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int modifiers)
-        {
-            const auto *w = static_cast<Window *>(glfwGetWindowUserPointer(window));
-            for (const auto &callback : w->_key_press_callbacks)
-            {
-                std::invoke(callback, key);
-            }
-        }
+        friend void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int modifiers);
     };
 
     void poll_window_events();

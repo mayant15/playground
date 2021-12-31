@@ -1,0 +1,18 @@
+﻿---
+BasedOnStyle: Microsoft
+AlignAfterOpenBracket: AlwaysBreak
+AlignTrailingComments: 'true'
+AllowAllArgumentsOnNextLine: 'true'
+AllowAllParametersOfDeclarationOnNextLine: 'true'
+BinPackArguments: 'false'
+BinPackParameters: 'false'
+BreakBeforeBraces: Custom
+BreakBeforeTernaryOperators: 'true'
+CompactNamespaces: 'false'
+ConstructorInitializerAllOnOneLineOrOnePerLine: 'true'
+FixNamespaceComments: 'true'
+Standard: Cpp11
+UseTab: Never
+NamespaceIndentation: All
+
+...

@@ -8,6 +8,16 @@ namespace pg
         pg::log::error("[GLFW{}]: {}", error, description);
     }
 
+    void glfw_key_callback(GLFWwindow *window, int key, int scancode, int action, int modifiers)
+
+    {
+        const auto *w = static_cast<Window *>(glfwGetWindowUserPointer(window));
+        for (const auto &callback : w->_key_press_callbacks)
+        {
+            std::invoke(callback, key);
+        }
+    }
+
     int Window::init(const WindowOp &op)
     {
         const char *glsl_version = "#version 460";
@@ -23,6 +33,9 @@ namespace pg
         // Create a new window and OpenGL context
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+        glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
         _p_window = glfwCreateWindow(op.width, op.height, op.title.c_str(), nullptr, nullptr);
         if (!_p_window)
