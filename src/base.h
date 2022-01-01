@@ -15,4 +15,4 @@
 
 #include <glm/glm.hpp>
 
-#include "types.h"
+#include "typedefs.h"

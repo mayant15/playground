@@ -1,8 +1,6 @@
 #include "ui.h"
 
 #include <array>
-#include <shaders/PhongShader.h>
-#include <shaders/SolidShader.h>
 
 namespace pg::ui
 {
@@ -54,12 +52,12 @@ namespace pg::ui
             ImGui::Separator();
 
             static std::array<std::string, 2> items = {
-                pg::shaders::SolidShader::name,
-                pg::shaders::PhongShader::name,
+                "SolidMaterial",
+                "PhongMaterial"
             };
 
             std::string combo_preview_value = config.shader_type;
-            if (ImGui::BeginCombo("Shader", combo_preview_value.c_str(), 0))
+            if (ImGui::BeginCombo("Material", combo_preview_value.c_str(), 0))
             {
                 for (int n = 0; n < items.size(); n++)
                 {

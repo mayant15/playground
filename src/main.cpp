@@ -3,11 +3,7 @@
 #include "base.h"
 #include "constants.h"
 #include "Window.h"
-#include "Shader.h"
 #include "VertexArrayInfo.h"
-
-#include "shaders/SolidShader.h"
-#include "shaders/PhongShader.h"
 
 #include "geometry/Rectangle.h"
 #include "geometry/Cube.h"
@@ -18,8 +14,12 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <photon/photon.h>
+
 int main(void)
 {
+    photon::Instance photon{};
+
     pg::Window window{};
     pg::WindowOp window_op{};
 
@@ -52,20 +52,20 @@ int main(void)
     // auto vertex_info = pg::create_rectangle_vertex_info();
     auto vertex_info = pg::create_cube_vertex_info();
 
+    auto solid_shader = photon.resources.shaders.get("D:\\code\\graphics\\playground\\src\\shaders\\solid.shader");
+    auto phong_shader = photon.resources.shaders.get("D:\\code\\graphics\\playground\\src\\shaders\\phong.shader");
+
+    photon::SolidMaterial material(solid_shader);
+
     pg::ui::UserConfig user_config{};
-    user_config.shader_type = pg::shaders::PhongShader::name;
+    user_config.shader_type = solid_shader->get_display_name();
 
-    pg::shaders::SolidShader solid_shader{};
-    pg::shaders::PhongShader phong_shader{};
 
-    const auto reload_shaders_callback = [&solid_shader, &phong_shader, &user_config](int key)
+    const auto reload_shaders_callback = [&material](int key)
     {
         if (key == GLFW_KEY_R)
         {
-            if (user_config.shader_type == pg::shaders::SolidShader::name)
-                solid_shader.reload();
-            else if (user_config.shader_type == pg::shaders::PhongShader::name)
-                phong_shader.reload();
+            material.reload();
         }
     };
     window.add_key_press_callback(reload_shaders_callback);
@@ -95,7 +95,6 @@ int main(void)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         }
 
-        const pg::Color fill_color{XYZW(user_config.fill_color)};
 
         glm::mat4 model(1.0);
         model = glm::translate(
@@ -110,26 +109,14 @@ int main(void)
 
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), width / (float)height, 0.1f, 100.0f);
 
-        if (user_config.shader_type == pg::shaders::SolidShader::name)
-        {
-            solid_shader.use();
-            solid_shader.set_uniforms(
-                fill_color,
-                model,
-                view,
-                projection);
-        }
-        else if (user_config.shader_type == pg::shaders::PhongShader::name)
-        {
-            phong_shader.use();
-            phong_shader.set_uniforms(
-                pg::Color{XYZW(user_config.ambient)},
-                pg::Color{XYZW(user_config.albedo)},
-                to_vec3_from_array(user_config.light_pos),
-                model,
-                view,
-                projection);
-        }
+        solid_shader->use();
+        
+        material.color = photon::Color {XYZW(user_config.fill_color)} ;
+        material.set_inputs();
+
+        solid_shader->set_mat4f("u_model", model);
+        solid_shader->set_mat4f("u_view", view);
+        solid_shader->set_mat4f("u_projection", projection);
 
         vertex_info.render();
 

@@ -6,7 +6,6 @@ namespace pg::ui
 {
     struct UserConfig
     {
-        std::string shader_type = "";
         ImVec4 clear_color = ImVec4(0.3, 0.3, 0.3, 0.3);
         ImVec4 fill_color = ImVec4(1.0, 1.0, 1.0, 1.0);
         bool wireframe = false;
@@ -22,6 +21,9 @@ namespace pg::ui
         // Object
         float object_pos[3] = {0.0, 0.0, 0.0};
         ImVec4 albedo = {0.6, 0.7, 0.2, 1.0};
+
+        // Material
+        std::string shader_type;
     };
 
     void init(GLFWwindow *window);

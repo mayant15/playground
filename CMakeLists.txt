@@ -15,15 +15,15 @@ add_subdirectory(external/spdlog)
 add_subdirectory(external/imgui)
 add_subdirectory(external/assimp)
 
+add_subdirectory(photon)
+
 set(SOURCES
   src/main.cpp
   src/Window.cpp
-  src/Shader.cpp
-  src/ShaderProgramImpl.cpp
   src/VertexArrayInfo.cpp
   src/utility/ui.cpp
 )
 
 add_executable(playground ${SOURCES})
 target_include_directories(playground PUBLIC src)
-target_link_libraries(playground PUBLIC glm glfw glad spdlog imgui)
+target_link_libraries(playground PUBLIC glm glfw glad spdlog imgui photon)
