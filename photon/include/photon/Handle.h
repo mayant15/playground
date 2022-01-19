@@ -13,6 +13,11 @@ namespace photon {
             return _ptr;
         }
 
+        template<class U>
+        constexpr inline Handle<U> cast() const {
+            return Handle<U>(reinterpret_cast<U*>(_ptr.get()));
+        }
+
     private:
         std::shared_ptr<T> _ptr;
     };
