@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "utility/errors.h"
 #include "utility/logger.h"
 
 namespace pg
@@ -18,15 +19,14 @@ namespace pg
         }
     }
 
-    int Window::init(const WindowOp &op)
+    Window::Window(const WindowOp &op)
     {
         const char *glsl_version = "#version 460";
 
         // Initialize
         if (glfwInit() == GLFW_FALSE)
         {
-            pg::log::error("Failed to initialize GLFW");
-            return EXIT_FAILURE;
+            throw pg::Error{"Failed to initialize GLFW"};
         }
         glfwSetErrorCallback(glfw_error_callback);
 
@@ -40,15 +40,14 @@ namespace pg
         _p_window = glfwCreateWindow(op.width, op.height, op.title.c_str(), nullptr, nullptr);
         if (!_p_window)
         {
-            pg::log::error("Failed to create GLFW window");
-            return EXIT_FAILURE;
+            glfwDestroyWindow(_p_window);
+            glfwTerminate();
+            throw pg::Error{"Failed to create GLFW window"};
         }
 
         glfwSetWindowUserPointer(_p_window, this);
 
         glfwSetKeyCallback(_p_window, pg::glfw_key_callback);
-
-        return EXIT_SUCCESS;
     }
 
     Window::~Window()

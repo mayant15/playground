@@ -13,11 +13,10 @@ namespace pg
 
     class Window
     {
-    public:
-        Window() = default;
+      public:
+        Window(const WindowOp &options);
         ~Window();
 
-        int init(const WindowOp &op);
         void set_current() const;
         std::pair<int, int> get_dims() const;
         bool should_close() const;
@@ -26,7 +25,7 @@ namespace pg
 
         void add_key_press_callback(const std::function<void(int)> &callback);
 
-    private:
+      private:
         GLFWwindow *_p_window = nullptr;
         std::vector<std::function<void(int)>> _key_press_callbacks = {};
 

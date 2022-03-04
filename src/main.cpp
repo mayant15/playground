@@ -9,6 +9,7 @@
 #include "geometry/Cube.h"
 #include "geometry/Rectangle.h"
 
+#include "utility/errors.h"
 #include "utility/logger.h"
 #include "utility/pgmath.h"
 #include "utility/ui.h"
@@ -17,18 +18,11 @@
 
 #include <photon/photon.h>
 
-int main(void)
+auto inner_main(void) -> void
 {
     photon::Instance photon{};
 
-    pg::Window window{};
-    pg::WindowOp window_op{};
-
-    if (window.init(window_op))
-    {
-        pg::log::error("Failed to create window");
-        return EXIT_FAILURE;
-    }
+    pg::Window window{pg::WindowOp{}};
 
     window.set_current();
 
@@ -36,8 +30,7 @@ int main(void)
     int version = gladLoadGL(glfwGetProcAddress);
     if (version == 0)
     {
-        pg::log::error("Failed to initialize glad");
-        return EXIT_FAILURE;
+        throw pg::Error{"Failed to initialize glad"};
     }
 
     // v-sync
@@ -130,6 +123,18 @@ int main(void)
 
     // Shutdown
     pg::ui::shutdown();
+}
 
-    return EXIT_SUCCESS;
+auto main() -> int
+{
+    try
+    {
+        inner_main();
+        return EXIT_SUCCESS;
+    }
+    catch (const pg::Error &e)
+    {
+        pg::log::error(e.what());
+        return EXIT_FAILURE;
+    }
 }
